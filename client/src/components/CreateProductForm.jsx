@@ -12,9 +12,9 @@ function CreateProductForm() {
 
   const handleSubmit = async(e) => {
     e.preventDefault()
-    
+
     try {
-      const response = await axios.post(`http://localhost:4001/products/`,
+      await axios.post(`http://localhost:4001/products/`,
       {
         name: name,
         price: price,

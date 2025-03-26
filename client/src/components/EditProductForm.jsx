@@ -1,6 +1,48 @@
-function EditProductForm() {
+import { useNavigate} from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+function EditProductForm({productId}) {
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+  const [price, setPrice] = useState(0);
+  const [description, setDescription] = useState("");
+  
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProduct = async() => {
+      try {
+        const response = await axios.get(`http://localhost:4001/products/${productId}`);
+        setName(response.data.data.name)
+        setUrl(response.data.data.image)
+        setPrice(response.data.data.price)
+        setDescription(response.data.data.description)
+      } catch(error) {
+        console.log(error)
+      }
+    };
+    fetchProduct();
+  }, []);
+
+  const handleUpdate = async(e) => {
+    e.preventDefault()
+    try {
+      await axios.put(`http://localhost:4001/products/${productId}`,
+      {
+        name: name,
+        price: price,
+        image: url,
+        description: description
+      });
+      navigate("/")
+    } catch(error) {
+      console.log(error);
+    } 
+  };
+
   return (
-    <form className="product-form">
+    <form className="product-form" onSubmit={handleUpdate}>
       <h1>Edit Product Form</h1>
       <div className="input-container">
         <label>
@@ -10,7 +52,8 @@ function EditProductForm() {
             name="name"
             type="text"
             placeholder="Enter name here"
-            onChange={() => {}}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </label>
       </div>
@@ -22,7 +65,8 @@ function EditProductForm() {
             name="image"
             type="text"
             placeholder="Enter image url here"
-            onChange={() => {}}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
           />
         </label>
       </div>
@@ -34,7 +78,8 @@ function EditProductForm() {
             name="price"
             type="number"
             placeholder="Enter price here"
-            onChange={() => {}}
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
           />
         </label>
       </div>
@@ -46,7 +91,8 @@ function EditProductForm() {
             name="description"
             type="text"
             placeholder="Enter description here"
-            onChange={() => {}}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             rows={4}
             cols={30}
           />
