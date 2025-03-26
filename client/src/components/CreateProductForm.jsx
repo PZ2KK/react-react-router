@@ -1,6 +1,45 @@
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 function CreateProductForm() {
+  const navigate = useNavigate();
+  const [isError, setIsError] = useState(null);
+  const [isLoading, setIsLoading] = useState(null);
+  const [product, setProduct] = useState({
+    name: "",
+    price: "",
+    image: "",
+    description: "",
+  });
+
+  const createProduct = async (productPayload) => {
+    try {
+      setIsError(false);
+      setIsLoading(true);
+      const results = await axios.post(
+        "http://localhost:4001/products",
+        {
+          ...productPayload,
+          price: +productPayload.price,
+        }
+      );
+      if (results.status !== 200) throw new Error("Error creating product");
+      navigate("/");
+    } catch (error) {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createProduct(product);
+  };
+
   return (
-    <form className="product-form">
+    <form className="product-form" onSubmit={handleSubmit}>
       <h1>Create Product Form</h1>
       <div className="input-container">
         <label>
@@ -10,7 +49,13 @@ function CreateProductForm() {
             name="name"
             type="text"
             placeholder="Enter name here"
-            onChange={() => {}}
+            value={product.name}
+            onChange={(e) =>
+              setProduct((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }
           />
         </label>
       </div>
@@ -22,7 +67,13 @@ function CreateProductForm() {
             name="image"
             type="text"
             placeholder="Enter image url here"
-            onChange={() => {}}
+            value={product.image}
+            onChange={(e) =>
+              setProduct((prev) => ({
+                ...prev,
+                image: e.target.value,
+              }))
+            }
           />
         </label>
       </div>
@@ -34,7 +85,13 @@ function CreateProductForm() {
             name="price"
             type="number"
             placeholder="Enter price here"
-            onChange={() => {}}
+            value={product.price}
+            onChange={(e) =>
+              setProduct((prev) => ({
+                ...prev,
+                price: e.target.value,
+              }))
+            }
           />
         </label>
       </div>
@@ -46,15 +103,24 @@ function CreateProductForm() {
             name="description"
             type="text"
             placeholder="Enter description here"
-            onChange={() => {}}
+            value={product.description}
+            onChange={(e) =>
+              setProduct((prev) => ({
+                ...prev,
+                description: e.target.value,
+              }))
+            }
             rows={4}
             cols={30}
           />
         </label>
       </div>
       <div className="form-actions">
-        <button type="submit">Create</button>
+        <button type="submit" disabled={isLoading}>
+          Create
+        </button>
       </div>
+      {isError && <h2>Error creating product</h2>}
     </form>
   );
 }
